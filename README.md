@@ -1,15 +1,13 @@
 # 🗓️ Planner Pessoal 
 
-Este projeto foi desenvolvido com o auxílio de Inteligência Artificial, focado no propósito de resolver problemas reais de organização de forma rápida e prática, priorizando a funcionalidade imediata sobre o aprendizado acadêmico. Ele nasceu da necessidade de ter um controle claro das tarefas diárias, categorias e prazos, tudo rodando **100% localmente** na sua máquina.
+Este projeto foi desenvolvido com o auxílio de Inteligência Artificial, focado no propósito de resolver problemas reais de organização de forma rápida e prática, priorizando a funcionalidade. Ele nasceu da necessidade de ter um controle claro das tarefas diárias, categorias e prazos, tudo rodando **100% localmente** na sua máquina.
 
 ---
 
 ## 📸 Demonstração
 
 > [!TIP]
-> Adicione aqui um print ou GIF do seu planner em ação!
-<!-- ![Screenshot do Planner](./public/img/demo.png) -->
-(Espaço reservado para sua imagem de demonstração)
+> ![Screenshot do Planner](./public/img/demo.png)
 
 ---
 
