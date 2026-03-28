@@ -1,4 +1,4 @@
-# 🗓️ Planner Pessoal - IA Assisted 🚀
+# 🗓️ Planner Pessoal 
 
 Este projeto foi desenvolvido com o auxílio de Inteligência Artificial, focado no propósito de resolver problemas reais de organização de forma rápida e prática, priorizando a funcionalidade imediata sobre o aprendizado acadêmico. Ele nasceu da necessidade de ter um controle claro das tarefas diárias, categorias e prazos, tudo rodando **100% localmente** na sua máquina.
 
@@ -60,5 +60,3 @@ Abra o seu navegador e acesse:
 - `public/`: Todo o frontend (HTML, CSS e JS modularizado).
 - `planner.db`: Arquivo gerado automaticamente com seus dados.
 
----
-Desenvolvido com auxílio de IA para solução rápida de problemas. ⚡️
