@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Planner Pessoal</title>
+    <link rel="icon" type="image/png" href="img/icon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen p-4 md:p-8">
+    
+    <div class="max-w-6xl mx-auto">
+        <!-- Header Superior Estilo Dashboard -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+            <div class="space-y-1">
+                <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Meu Dia</h1>
+                <p class="text-lg text-slate-500 font-medium" id="currentDateDisplay"></p>
+            </div>
+            
+            <div class="flex flex-wrap gap-3">
+                <button onclick="sendEmailSummary()" class="flex items-center gap-2 bg-white border border-slate-200 text-blue-600 px-5 py-2.5 rounded-xl font-semibold hover:bg-blue-50 transition-all shadow-sm">
+                    <i class="far fa-envelope text-lg"></i>
+                    <span>E-mail</span>
+                </button>
+                <button onclick="generateWhatsAppSummary()" class="flex items-center gap-2 bg-white border border-slate-200 text-green-600 px-5 py-2.5 rounded-xl font-semibold hover:bg-green-50 transition-all shadow-sm">
+                    <i class="fab fa-whatsapp text-lg"></i>
+                    <span>WhatsApp</span>
+                </button>
+                <button onclick="toggleModal('categoryModal')" class="flex items-center gap-2 bg-white border border-slate-200 text-slate-600 px-5 py-2.5 rounded-xl font-semibold hover:bg-slate-50 transition-all shadow-sm">
+                    <i class="fas fa-folder-plus text-lg text-indigo-500"></i>
+                    <span>Categorias</span>
+                </button>
+                <button onclick="toggleModal('taskModal')" class="flex items-center gap-2 bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200">
+                    <i class="fas fa-plus text-lg"></i>
+                    <span>Nova Tarefa</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Grade de Layout Moderna -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Coluna Principal: Lista de Tarefas (Larga) -->
+            <main class="lg:col-span-8 space-y-8">
+                
+                <!-- Lista de Tarefas: Hoje -->
+                <section class="mb-12">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <span class="w-2 h-8 bg-indigo-500 rounded-full"></span>
+                            <span id="selectedDayLabel">Hoje</span>
+                        </h2>
+                        <span id="pendingCount" class="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full uppercase">0 pendentes</span>
+                    </div>
+                    
+                    <div id="taskList" class="grid grid-cols-1 gap-4">
+                        <p class="text-slate-400 text-center py-12 card bg-white/50">Carregando suas tarefas...</p>
+                    </div>
+                </section>
+
+                <!-- Visualização Semanal/Mensal -->
+                <section>
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <span class="w-2 h-8 bg-violet-500 rounded-full"></span>
+                            Calendário
+                        </h2>
+                        <div class="flex bg-slate-100 p-1 rounded-xl">
+                            <button id="viewWeekBtn" onclick="renderWeeklyView()" class="text-xs font-bold px-4 py-1.5 rounded-lg bg-white text-indigo-600 shadow-sm transition-all">Semana</button>
+                            <button id="viewMonthBtn" onclick="renderCalendarGrid()" class="text-xs font-bold px-4 py-1.5 rounded-lg text-slate-500 hover:text-slate-700 transition-all">Mensal</button>
+                        </div>
+                    </div>
+                    
+                    <div id="calendarContainer" class="bg-white rounded-3xl p-4 border border-slate-100 shadow-sm">
+                        <div id="calendarNav" class="hidden flex items-center justify-between mb-4 px-2">
+                            <button onclick="changeMonth(-1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-600 transition">
+                                <i class="fas fa-chevron-left text-xs"></i>
+                            </button>
+                            <h3 id="calendarMonthTitle" class="text-sm font-black text-slate-700 uppercase tracking-widest">Mês Atual</h3>
+                            <button onclick="changeMonth(1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-600 transition">
+                                <i class="fas fa-chevron-right text-xs"></i>
+                            </button>
+                        </div>
+                        <div id="calendarHeader" class="hidden grid-cols-7 mb-2 text-center">
+                            <span class="text-[10px] font-black text-slate-400 uppercase">Dom</span>
+                            <span class="text-[10px] font-black text-slate-400 uppercase">Seg</span>
+                            <span class="text-[10px] font-black text-slate-400 uppercase">Ter</span>
+                            <span class="text-[10px] font-black text-slate-400 uppercase">Qua</span>
+                            <span class="text-[10px] font-black text-slate-400 uppercase">Qui</span>
+                            <span class="text-[10px] font-black text-slate-400 uppercase">Sex</span>
+                            <span class="text-[10px] font-black text-slate-400 uppercase">Sáb</span>
+                        </div>
+                        <div id="weeklyView" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-7 gap-3">
+                            <!-- Calendário dinâmico -->
+                        </div>
+                    </div>
+                </section>
+
+                <section id="completedSection" class="hidden">
+                    <!-- Escondido pois tarefas concluídas são auto-excluídas -->
+                </section>
+            </main>
+
+            <!-- Barra Lateral: Detalhes e Categorias -->
+            <aside class="lg:col-span-4 space-y-8">
+                
+                <div id="taskDetailsPanel" class="card p-6 bg-white border-slate-200 shadow-xl hidden animate-in fade-in slide-in-from-right-4 duration-300">
+                    <div class="flex justify-between items-start mb-6">
+                        <h3 class="text-xl font-black text-slate-800 tracking-tight">Detalhes</h3>
+                        <button onclick="closeDetails()" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times"></i></button>
+                    </div>
+                    
+                    <div id="detailsContent" class="space-y-6">
+                        <!-- Conteúdo dinâmico -->
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <h2 class="text-lg font-bold mb-6 text-slate-800 flex items-center gap-2">
+                        <i class="fas fa-layer-group text-indigo-500"></i>
+                        Suas Categorias
+                    </h2>
+                    <div id="categoryContainer" class="flex flex-col gap-3">
+                        <!-- Categorias dinâmicas com contagem -->
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Modal: Nova/Editar Tarefa -->
+    <div id="taskModal" class="fixed inset-0 bg-black/50 hidden items-start justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-white rounded-2xl w-full max-w-2xl my-12 p-8 shadow-2xl relative">
+            <h3 id="modalTitle" class="text-xl font-bold mb-4">Nova Tarefa</h3>
+            <form id="taskForm" class="space-y-4" onsubmit="event.preventDefault(); addTask(event);">
+                <input type="hidden" id="taskId">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Título</label>
+                    <input type="text" id="taskTitle" required class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700">Data</label>
+                        <input type="date" id="taskDate" required class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700">Horário (Opcional)</label>
+                        <input type="time" id="taskTime" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Categoria</label>
+                    <select id="taskCategory" required class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        <!-- Opções dinâmicas -->
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700">Descrição (Links, Detalhes)</label>
+                        <textarea id="taskDescription" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm" rows="3" placeholder="Insira detalhes ou links..."></textarea>
+                    </div>
+                    <div class="bg-indigo-50/50 p-3 rounded-xl border border-indigo-100/50 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-[10px] font-black uppercase text-indigo-400 tracking-wider">Convidados</h4>
+                            <span class="text-[10px] text-slate-400 italic">Separe por vírgula</span>
+                        </div>
+                        <div class="space-y-2">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase">E-mails</label>
+                                <input type="text" id="taskGuestEmail" class="w-full mt-0.5 p-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 text-xs placeholder:text-slate-300" placeholder="ana@exemplo.com, joao@exemplo.com">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase">WhatsApp (com DDD)</label>
+                                <input type="text" id="taskGuestPhone" class="w-full mt-0.5 p-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 text-xs placeholder:text-slate-300" placeholder="5511999999999, 5511888888888">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700">Me avise por e-mail faltando:</label>
+                        <select id="taskReminder" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+                            <option value="0">Não notificar</option>
+                            <option value="60">1 hora antes</option>
+                            <option value="1440">1 dia antes</option>
+                            <option value="4320">3 dias antes</option>
+                        </select>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase">Repetição</label>
+                            <select id="taskRecurrence" onchange="_handleRecurrenceChange()" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm">
+                                <option value="none">Não repetir</option>
+                                <option value="daily">Diariamente</option>
+                                <option value="weekdays">Dias da Semana (Seg-Sex)</option>
+                                <option value="weekly">Semanalmente (Mesmo dia)</option>
+                                <option value="custom">Personalizado (Dias/Horários específicos)</option>
+                            </select>
+                        </div>
+
+                        <!-- Container para configuração personalizada -->
+                        <div id="customRecurrenceUI" class="hidden space-y-2 border-t pt-2 mt-2">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase italic mb-2">Selecione os dias e horários:</p>
+                            <div class="grid grid-cols-1 gap-2">
+                                <template id="customDayRow">
+                                    <div class="flex items-center gap-2 bg-white p-2 rounded-lg border border-slate-100">
+                                        <input type="checkbox" class="day-check rounded text-indigo-600">
+                                        <span class="text-xs font-bold w-12 day-label">SEG</span>
+                                        <input type="time" class="day-time flex-1 p-1 border rounded text-xs focus:ring-1 focus:ring-indigo-500">
+                                    </div>
+                                </template>
+                                <div id="customDaysList" class="space-y-1">
+                                    <!-- JS vai inserir as linhas aqui -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" id="taskImportant" class="rounded text-indigo-600">
+                        <span class="text-sm font-medium text-slate-700">É Importante?</span>
+                    </label>
+                </div>
+                <div class="flex gap-2 pt-4">
+                    <button type="button" onclick="toggleModal('taskModal')" class="flex-1 px-4 py-2 border rounded-lg hover:bg-slate-50 transition">Cancelar</button>
+                    <button type="submit" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Nova Categoria -->
+    <div id="categoryModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="text-xl font-bold mb-4">Nova Categoria</h3>
+            <form id="categoryForm" class="space-y-4" onsubmit="event.preventDefault(); addCategory(event);">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Nome da Categoria</label>
+                    <input type="text" id="catName" required placeholder="Ex: Pesquisa, Esporte" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Cor da Categoria</label>
+                    <div class="flex gap-2 mt-2">
+                        <input type="color" id="catColor" value="#6366f1" class="h-10 w-20 p-1 rounded-lg border cursor-pointer border-slate-200">
+                        <p class="text-[10px] text-slate-400 self-center">Escolha uma cor para identificar suas tarefas.</p>
+                    </div>
+                </div>
+                <div class="flex gap-2 pt-4">
+                    <button type="button" onclick="toggleModal('categoryModal')" class="flex-1 px-4 py-2 border rounded-lg hover:bg-slate-50">Cancelar</button>
+                    <button type="submit" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/calendar.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
