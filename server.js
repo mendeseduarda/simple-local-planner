@@ -212,7 +212,7 @@ app.post('/api/send-email', async (req, res) => {
               <h2 style="color: #4f46e5; border-bottom: 2px solid #eef2ff; padding-bottom: 10px;">🗓️ Seu Planejamento</h2>
               <ul style="padding: 0;">${taskListHtml}</ul>
               <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
-              <p style="font-size: 0.8em; color: #94a3b8; text-align: center;">Enviado com 💜 pelo seu Planner VibeCodado.</p>
+              <p style="font-size: 0.8em; color: #94a3b8; text-align: center;">Enviado com 💜 pelo seu Planner.</p>
           </div>
       `
   };

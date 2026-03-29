@@ -34,12 +34,14 @@ No terminal, dentro da pasta do projeto, instale as dependências:
 npm install
 ```
 
-### 3. Configuração (Opcional - E-mail)
-Se você quiser usar a função de envio de e-mail, crie um arquivo `.env` na raiz do projeto com as seguintes credenciais:
+### 3. Configuração (Opcional - E-mail e Whatsapp)
+Se você quiser usar a função de envio de e-mail e whatsapp, crie um arquivo `.env` na raiz do projeto com as seguintes credenciais:
 ```env
+WHATSAPP_NUMBER=seu-numero
 EMAIL_USER=seu-email@gmail.com
 EMAIL_PASS=sua-senha-de-app
 ```
+* Obs: A senha do email tem que ser gerada nas configurações do seu email (senha de app) e tem 16 caracteres 
 
 ### 4. Execução
 Inicie o servidor local:
