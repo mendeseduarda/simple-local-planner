@@ -47,6 +47,7 @@ db.exec(`
     description TEXT,
     guest_email TEXT,
     guest_phone TEXT,
+    completed_dates TEXT,
     FOREIGN KEY (category_id) REFERENCES categories (id)
   );
 `);
@@ -61,6 +62,11 @@ try {
       ALTER TABLE tasks ADD COLUMN recurrence_config TEXT;
     `);
     console.log("Colunas de recorrência adicionadas via migração.");
+  }
+  const hasCompletedDates = columns.some(c => c.name === 'completed_dates');
+  if (!hasCompletedDates) {
+    db.exec(`ALTER TABLE tasks ADD COLUMN completed_dates TEXT;`);
+    console.log("Coluna completed_dates adicionada.");
   }
 } catch (e) {
   console.warn("Erro na migração automática:", e.message);
@@ -121,14 +127,38 @@ app.post('/api/tasks', (req, res) => {
 
 app.patch('/api/tasks/:id', (req, res) => {
   const { id } = req.params;
-  const { is_completed, title, date, time, category_id, is_important, recurrence, recurrence_config, reminder_minutes, description, guest_email, guest_phone } = req.body;
+  const { is_completed, date: completionDate, title, date, time, category_id, is_important, recurrence, recurrence_config, reminder_minutes, description, guest_email, guest_phone } = req.body;
   
   if (is_completed !== undefined) {
+      const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(id);
+      if (!task) return res.status(404).json({ error: 'Tarefa não encontrada' });
+
       if (is_completed) {
-          db.prepare('DELETE FROM tasks WHERE id = ?').run(id);
-          return res.json({ success: true, deleted: true });
+          if (task.recurrence && task.recurrence !== 'none') {
+              // Para tarefas recorrentes, adicionamos a data à lista de concluídas
+              const completedDates = task.completed_dates ? JSON.parse(task.completed_dates) : [];
+              const dateToMark = completionDate || new Date().toISOString().split('T')[0];
+              
+              if (!completedDates.includes(dateToMark)) {
+                  completedDates.push(dateToMark);
+                  db.prepare('UPDATE tasks SET completed_dates = ? WHERE id = ?').run(JSON.stringify(completedDates), id);
+              }
+              return res.json({ success: true, repetitive: true });
+          } else {
+              // Para tarefas simples, mantemos o comportamento de exclusão se desejado ou apenas marcamos
+              db.prepare('DELETE FROM tasks WHERE id = ?').run(id);
+              return res.json({ success: true, deleted: true });
+          }
       } else {
-          db.prepare('UPDATE tasks SET is_completed = ? WHERE id = ?').run(0, id);
+          // Desmarcar como concluído
+          if (task.recurrence && task.recurrence !== 'none' && completionDate) {
+              const completedDates = task.completed_dates ? JSON.parse(task.completed_dates) : [];
+              const newCompletedDates = completedDates.filter(d => d !== completionDate);
+              db.prepare('UPDATE tasks SET completed_dates = ? WHERE id = ?').run(JSON.stringify(newCompletedDates), id);
+              return res.json({ success: true });
+          } else {
+              db.prepare('UPDATE tasks SET is_completed = ? WHERE id = ?').run(0, id);
+          }
       }
   } else {
       // Edição completa da tarefa

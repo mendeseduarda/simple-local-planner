@@ -393,8 +393,17 @@ async function _addCategory(e) {
     }
 }
 
-async function _toggleComplete(id, status) {
-    await PlannerAPI.toggleTaskComplete(id, status);
+async function _toggleComplete(id, status, date = null) {
+    // Se não passou data, tenta pegar do contexto atual (filtro de dia)
+    if (!date) {
+        const labelEl = document.getElementById('selectedDayLabel');
+        if (labelEl && labelEl.dataset.date) {
+            date = labelEl.dataset.date;
+        } else {
+            date = new Date().toISOString().split('T')[0];
+        }
+    }
+    await PlannerAPI.toggleTaskComplete(id, status, date);
     _loadData();
 }
 
@@ -505,7 +514,10 @@ async function _deleteCategory(id) {
 
 function _filterByDay(dateISO, label) {
     const labelEl = document.getElementById('selectedDayLabel');
-    if (labelEl) labelEl.innerText = label;
+    if (labelEl) {
+        labelEl.innerText = label;
+        labelEl.dataset.date = dateISO; // Salva a data para contexto de conclusão
+    }
 
     // Usar PlannerUtils.isTaskOnDate para incluir tarefas semanais no filtro
     const filteredTasks = tasks.filter(t => {
@@ -549,6 +561,17 @@ function _filterByDay(dateISO, label) {
 
 function renderTaskItem(task, container, catColor) {
     const div = document.createElement('div');
+    // Para identificar em qual data estamos renderizando (importante para marcar recorrentes)
+    const labelEl = document.getElementById('selectedDayLabel');
+    const todayISO = new Date().toISOString().split('T')[0];
+    let currentCtxDate = todayISO;
+    
+    // Se estivermos em um dia específico, usar essa data
+    const weeklyView = document.getElementById('weeklyView');
+    if (labelEl && labelEl.innerText !== 'Hoje' && labelEl.dataset.date) {
+        currentCtxDate = labelEl.dataset.date;
+    }
+
     div.onclick = () => showTaskDetails(task.id);
     div.className = `task-item card p-4 flex items-center justify-between group cursor-pointer border-l-4 ${task.is_important ? 'task-important' : 'border-l-indigo-500'}`;
     
@@ -560,7 +583,7 @@ function renderTaskItem(task, container, catColor) {
 
     div.innerHTML = `
         <div class="flex items-center gap-5 flex-1 min-w-0">
-            <div onclick="event.stopPropagation(); _toggleComplete(${task.id}, 1)" class="checkbox-custom ${task.is_important ? 'border-orange-200' : ''}">
+            <div onclick="event.stopPropagation(); _toggleComplete(${task.id}, 1, '${currentCtxDate}')" class="checkbox-custom ${task.is_important ? 'border-orange-200' : ''}">
                 <i class="fas fa-check text-[10px] text-white transition-opacity opacity-0 group-hover:opacity-20" style="${catColor ? 'color: ' + catColor : ''}"></i>
             </div>
             <div class="min-w-0">

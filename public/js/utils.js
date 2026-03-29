@@ -19,6 +19,14 @@ function isTaskOnDate(task, targetDateISO) {
     // Nenhuma tarefa aparece antes da sua data de início
     if (targetDate < startDate) return false;
 
+    // Se a tarefa já foi marcada como concluída para esta data, não exibir
+    if (task.completed_dates) {
+        try {
+            const completed = JSON.parse(task.completed_dates);
+            if (completed.includes(targetDateISO)) return false;
+        } catch (e) {}
+    }
+
     // Se for a mesma data exata do registro original
     if (task.date === targetDateISO) return true;
     

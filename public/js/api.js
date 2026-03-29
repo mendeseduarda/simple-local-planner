@@ -29,11 +29,11 @@ async function deleteTaskById(id) {
     if (!response.ok) throw new Error('Erro ao excluir tarefa');
 }
 
-async function toggleTaskComplete(id, status) {
+async function toggleTaskComplete(id, status, date = null) {
     const response = await fetch(`${API}/tasks/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ is_completed: status })
+        body: JSON.stringify({ is_completed: status, date: date })
     });
     if (!response.ok) throw new Error('Erro ao atualizar tarefa');
 }
